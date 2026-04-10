@@ -40,7 +40,7 @@ HTML-raportti (valmis output)
 ## Esimerkkiskenaario — Jankon Betoni Oy
 
 Tässä esimerkissä OracleReportAI generoi vuosiraportin **Jankon Betoni Oy:lle** —
-tamperelainen betonituotteiden toimittaja, perustettu 1987.
+tamperelaiselle betonituotteiden toimittajalle, joka on ollut toiminnassa vuodesta 1987.
 
 ![Jankon Betoni Raportti](screenshots/jankos_beton.png)
 
