@@ -9,7 +9,6 @@ Projekti generoi ihmisluettavan HTML-raportin suoraan tietokannasta — ilman ma
 ---
 
 ## Arkkitehtuuri
-
 Oracle DB (myyntidata)
 ↓
 PL/SQL (aggregoi datan yhteenvedoksi)
@@ -19,6 +18,8 @@ Python (lukee DB:stä, kutsuu Claude APIa)
 Claude API (kirjoittaa narratiivin datasta)
 ↓
 HTML-raportti (valmis output)
+
+---
 
 ## Teknologiapino
 
@@ -30,6 +31,92 @@ HTML-raportti (valmis output)
 | AI | Claude API (claude-sonnet) |
 | Output | HTML-raportti |
 | Versionhallinta | GitHub |
+
+---
+
+## Esimerkkiskenaario — Jankon Betoni Oy
+
+Tässä esimerkissä OracleReportAI generoi vuosiraportin **Jankon Betoni Oy:lle** —
+tamperelainen betonituotteiden toimittaja, perustettu 1987.
+
+![Jankon Betoni Raportti](screenshots/jankos_beton.png)
+
+
+### Tietokannassa oleva myyntidata
+
+Tietokanta sisältää 5 asiakasta, 5 tuotetta ja 16 myyntitapahtumaa vuodelta 2025.
+
+**Tuotteet:**
+
+| Tuote | Kategoria | Á-hinta |
+|-------|-----------|---------|
+| Jankon Erikoisbetoni K30 | Betoni | 320 € |
+| Peruspilkkabetoni K20 | Betoni | 180 € |
+| Betonipumppaus Premium | Palvelut | 1 200 € |
+| Jankon Salainen Lisäaine | Lisäaineet | 450 € |
+| Hätäbetoni (24h toimitus) | Betoni | 580 € |
+
+**Asiakkaat:**
+
+| Asiakas | Kaupunki | Segmentti |
+|---------|----------|-----------|
+| Heikki Valimaki Ky | Tampere | Yritys |
+| Pentti Kukkonen | Hämeenlinna | Kuluttaja |
+| Möttösen Rakennus Oy | Jyväskylä | Yritys |
+| Reijo Paasonen | Tampere | Kuluttaja |
+| Hirmuinen Oy | Helsinki | Yritys |
+
+### Mitä tapahtuu kun ajat `python src/main.py`
+
+**1. Python kutsuu Oracle-tietokantaa**
+
+PL/SQL-proseduuri `report_pkg.get_vuosiraportti(2025)` aggregoi myyntidatan
+ja palauttaa JSON-yhteenvedon:
+
+```json
+{
+  "vuosi": 2025,
+  "kokonaismyynti": 41270,
+  "myyntikpl": 16,
+  "paras_tuote": "Jankon Erikoisbetoni K30",
+  "paras_asiakas": "Heikki Valimaki Ky",
+  "q1": 7850,
+  "q2": 11360,
+  "q3": 12260,
+  "q4": 9800
+}
+```
+
+**2. Python lähettää datan Claude API:lle**
+
+Claude saa datan ja kirjoittaa johdon katsauksen automaattisesti.
+
+**3. Claude generoi narratiivin**
+
+> *Jankon Betoni Oy saavutti vuonna 2025 kokonaismyynnin 41 270 euroa
+> 16 myyntitapahtuman kautta. Keskimääräinen kauppakoko oli 2 579 euroa,
+> mikä kuvastaa yhtiön keskittymistä laadukkaaseen betonituotantoon ja
+> pitkäaikaisiin asiakassuhteisiin.*
+>
+> *Kvartaalikohtainen tarkastelu osoittaa selkeää kasvutrendiä vuoden
+> alkupuoliskolla. Q1:n 7 850 euron myynti kasvoi Q2:ssa 44,7 % tasolle
+> 11 360 euroa. Q3 oli vuoden vahvin 12 260 eurolla, mutta Q4:ssä myynti
+> laski 20,1 % tasolle 9 800 euroa — heijastellen rakennusalan
+> kausivaihtelua ja talvikauden vaikutusta betonityömaiden aktiivisuuteen.*
+>
+> *Tuoteportfoliossa Jankon Erikoisbetoni K30 vahvisti asemansa yhtiön
+> menestystuotteena. Asiakaspuolella Heikki Valimaki Ky säilytti asemansa
+> merkittävimpänä asiakkaana, osoittaen pitkäaikaisten kumppanuussuhteiden
+> arvon yhtiön liiketoiminnalle.*
+>
+> *Vuoden 2026 näkymät ovat maltillisen optimistiset, erityisesti kun
+> huomioidaan Jankon Erikoisbetoni K30:n vahva markkina-asema ja
+> vakiintuneet asiakassuhteet.*
+
+**4. Valmis HTML-raportti tallentuu** kansioon `output/raportti_2025.html`
+
+> Koko pipeline — tietokantakysely, AI-analyysi ja raportin generointi —
+> suoritetaan yhdellä komennolla alle 15 sekunnissa.
 
 ---
 
@@ -100,16 +187,6 @@ python src/main.py
 ```
 
 Raportti generoituu kansioon `output/raportti_2025.html`
-
----
-
-## Esimerkkioutput
-
-Raportti sisältää:
-- Kokonaismyynti ja myyntitapahtumien määrä
-- Kvartaalikohtainen myyntidata (Q1–Q4)
-- Paras tuote ja paras asiakas
-- Claude AI:n generoima johdon katsaus
 
 ---
 
