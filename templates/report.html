@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <title>Jankon Betoni Oy — Vuosiraportti {{ data.vuosi }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e, #374151);
+            color: white;
+            padding: 48px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.4em; letter-spacing: 2px; }
+        .header p { font-size: 1.1em; opacity: 0.7; margin-top: 8px; }
+        .header .vuosi { font-size: 1.3em; margin-top: 16px; opacity: 0.9; }
+
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 24px; }
+
+        .kortit {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .kortti {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border-left: 4px solid #374151;
+        }
+        .kortti.highlight { border-left-color: #f59e0b; }
+        .kortti label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; }
+        .kortti .arvo { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-top: 6px; }
+        .kortti .yksikko { font-size: 0.9em; color: #6b7280; }
+
+        .kvartaalit {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .kvartaalit h2 { font-size: 1.1em; margin-bottom: 20px; color: #374151; }
+        .q-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .q-item { text-align: center; padding: 16px; background: #f9fafb; border-radius: 8px; }
+        .q-item .q-label { font-size: 0.8em; color: #6b7280; font-weight: 600; }
+        .q-item .q-arvo { font-size: 1.4em; font-weight: 700; color: #1a1a2e; margin-top: 4px; }
+
+        .narratiivi {
+            background: white;
+            border-radius: 12px;
+            padding: 36px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            margin-bottom: 32px;
+            line-height: 1.8;
+        }
+        .narratiivi h2 { font-size: 1.1em; color: #374151; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .narratiivi p { margin-bottom: 16px; color: #374151; }
+
+        .footer { text-align: center; padding: 32px; color: #9ca3af; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>JANKON BETONI OY</h1>
+    <p>Laadukasta betonia 1987 lähtien</p>
+    <div class="vuosi">Vuosiraportti {{ data.vuosi }}</div>
+</div>
+
+<div class="container">
+
+    <div class="kortit">
+        <div class="kortti highlight">
+            <label>Kokonaismyynti</label>
+            <div class="arvo">{{ "{:,.0f}".format(data.kokonaismyynti) }}</div>
+            <div class="yksikko">euroa</div>
+        </div>
+        <div class="kortti">
+            <label>Myyntitapahtumia</label>
+            <div class="arvo">{{ data.myyntikpl }}</div>
+            <div class="yksikko">kappaletta</div>
+        </div>
+        <div class="kortti">
+            <label>Paras tuote</label>
+            <div class="arvo" style="font-size:1.2em">{{ data.paras_tuote }}</div>
+        </div>
+        <div class="kortti">
+            <label>Paras asiakas</label>
+            <div class="arvo" style="font-size:1.2em">{{ data.paras_asiakas }}</div>
+        </div>
+    </div>
+
+    <div class="kvartaalit">
+        <h2>Kvartaalikohtainen myynti</h2>
+        <div class="q-grid">
+            <div class="q-item">
+                <div class="q-label">Q1</div>
+                <div class="q-arvo">{{ "{:,.0f}".format(data.q1) }} €</div>
+            </div>
+            <div class="q-item">
+                <div class="q-label">Q2</div>
+                <div class="q-arvo">{{ "{:,.0f}".format(data.q2) }} €</div>
+            </div>
+            <div class="q-item">
+                <div class="q-label">Q3</div>
+                <div class="q-arvo">{{ "{:,.0f}".format(data.q3) }} €</div>
+            </div>
+            <div class="q-item">
+                <div class="q-label">Q4</div>
+                <div class="q-arvo">{{ "{:,.0f}".format(data.q4) }} €</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="narratiivi">
+        <h2>Johdon katsaus</h2>
+        {% for kappale in narratiivi.split('\n') %}
+            {% if kappale.strip() and not kappale.startswith('#') and not kappale.startswith('**') %}
+                <p>{{ kappale }}</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+</div>
+
+<div class="footer">
+    Raportti generoitu {{ paivamaara }} &mdash; OracleReportAI &mdash; Jankon Betoni Oy
+</div>
+
+</body>
+</html>

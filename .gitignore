@@ -1,0 +1,8 @@
+@"
+.env
+venv/
+output/
+oracle-data/
+__pycache__/
+*.pyc
+"@ | Set-Content .gitignore

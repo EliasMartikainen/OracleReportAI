@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <title>Jankon Betoni Oy — Raporttiportaali</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e, #374151);
+            color: white;
+            padding: 48px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.4em; letter-spacing: 2px; }
+        .header p { opacity: 0.7; margin-top: 8px; }
+
+        .container { max-width: 800px; margin: 60px auto; padding: 0 24px; }
+
+        .kortti {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .kortti h2 { font-size: 1.4em; margin-bottom: 12px; color: #374151; }
+        .kortti p { color: #6b7280; margin-bottom: 32px; line-height: 1.6; }
+
+        .nappi {
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            letter-spacing: 1px;
+        }
+        .nappi:hover { background: #374151; }
+        .nappi:disabled { background: #9ca3af; cursor: not-allowed; }
+
+        .lataaja {
+            display: none;
+            margin-top: 32px;
+            text-align: center;
+        }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #1a1a2e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .lataaja p { color: #6b7280; font-style: italic; }
+
+        /* Raportti */
+        .raportti { display: none; }
+
+        .kortit {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border-left: 4px solid #374151;
+        }
+        .stat.kultainen { border-left-color: #f59e0b; }
+        .stat label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; }
+        .stat .arvo { font-size: 1.8em; font-weight: 700; margin-top: 4px; }
+        .stat .sub { font-size: 0.85em; color: #9ca3af; }
+
+        .kvartaalit {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .kvartaalit h3 { font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-bottom: 20px; }
+        .q-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .q-item { text-align: center; background: #f9fafb; border-radius: 8px; padding: 16px; }
+        .q-item .q-label { font-size: 0.75em; font-weight: 700; color: #6b7280; }
+        .q-item .q-arvo { font-size: 1.3em; font-weight: 700; margin-top: 4px; }
+
+        .narratiivi-kortti {
+            background: white;
+            border-radius: 12px;
+            padding: 36px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .narratiivi-kortti h3 { font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-bottom: 20px; }
+        .narratiivi-kortti p { line-height: 1.8; color: #374151; margin-bottom: 14px; }
+
+        .virhe { color: #ef4444; margin-top: 16px; font-size: 0.9em; }
+        .footer { text-align: center; padding: 40px; color: #9ca3af; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>JANKON BETONI OY</h1>
+    <p>Laadukasta betonia 1987 lähtien — Raporttiportaali</p>
+</div>
+
+<div class="container">
+    <div class="kortti">
+        <h2>Vuosiraportti</h2>
+        <p>Generoi tekoälyllä kirjoitettu liiketoimintaraportti suoraan Oracle-tietokannasta.<br>
+        Claude analysoi myyntidatan ja kirjoittaa johdon katsauksen automaattisesti.</p>
+        <button class="nappi" onclick="generoiRaportti(2025)">
+            ▶ Generoi raportti 2025
+        </button>
+        <div class="lataaja" id="lataaja">
+            <div class="spinner"></div>
+            <p id="latausViesti">Haetaan dataa Oraclesta...</p>
+        </div>
+        <p class="virhe" id="virhe"></p>
+    </div>
+
+    <div class="raportti" id="raportti">
+        <div class="kortit">
+            <div class="stat kultainen">
+                <label>Kokonaismyynti</label>
+                <div class="arvo" id="kokonaismyynti">—</div>
+                <div class="sub">euroa</div>
+            </div>
+            <div class="stat">
+                <label>Myyntitapahtumia</label>
+                <div class="arvo" id="myyntikpl">—</div>
+                <div class="sub">kappaletta</div>
+            </div>
+            <div class="stat">
+                <label>Paras tuote</label>
+                <div class="arvo" style="font-size:1em" id="parasTuote">—</div>
+            </div>
+            <div class="stat">
+                <label>Paras asiakas</label>
+                <div class="arvo" style="font-size:1em" id="parasAsiakas">—</div>
+            </div>
+        </div>
+
+        <div class="kvartaalit">
+            <h3>Kvartaalikohtainen myynti</h3>
+            <div class="q-grid">
+                <div class="q-item"><div class="q-label">Q1</div><div class="q-arvo" id="q1">—</div></div>
+                <div class="q-item"><div class="q-label">Q2</div><div class="q-arvo" id="q2">—</div></div>
+                <div class="q-item"><div class="q-label">Q3</div><div class="q-arvo" id="q3">—</div></div>
+                <div class="q-item"><div class="q-label">Q4</div><div class="q-arvo" id="q4">—</div></div>
+            </div>
+        </div>
+
+        <div class="narratiivi-kortti">
+            <h3>Johdon katsaus — Claude AI</h3>
+            <div id="narratiivi"></div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">OracleReportAI &mdash; Jankon Betoni Oy &mdash; Elias Martikainen / Eldarisoft</div>
+
+<script>
+async function generoiRaportti(vuosi) {
+    const nappi = document.querySelector('.nappi');
+    const lataaja = document.getElementById('lataaja');
+    const raportti = document.getElementById('raportti');
+    const virhe = document.getElementById('virhe');
+    const latausViesti = document.getElementById('latausViesti');
+
+    nappi.disabled = true;
+    lataaja.style.display = 'block';
+    raportti.style.display = 'none';
+    virhe.textContent = '';
+
+    const viestit = [
+        'Haetaan dataa Oraclesta...',
+        'Lasketaan kvartaaliluvut...',
+        'Claude kirjoittaa johdon katsausta...',
+        'Viimeistellään raporttia...'
+    ];
+    let i = 0;
+    const intervalId = setInterval(() => {
+        latausViesti.textContent = viestit[Math.min(i++, viestit.length - 1)];
+    }, 2000);
+
+    try {
+        const res = await fetch(`/generoi/${vuosi}`);
+        const json = await res.json();
+        clearInterval(intervalId);
+
+        if (!json.ok) throw new Error(json.virhe);
+
+        const d = json.data;
+        document.getElementById('kokonaismyynti').textContent = d.kokonaismyynti.toLocaleString('fi-FI');
+        document.getElementById('myyntikpl').textContent = d.myyntikpl;
+        document.getElementById('parasTuote').textContent = d.paras_tuote;
+        document.getElementById('parasAsiakas').textContent = d.paras_asiakas;
+        document.getElementById('q1').textContent = d.q1.toLocaleString('fi-FI') + ' €';
+        document.getElementById('q2').textContent = d.q2.toLocaleString('fi-FI') + ' €';
+        document.getElementById('q3').textContent = d.q3.toLocaleString('fi-FI') + ' €';
+        document.getElementById('q4').textContent = d.q4.toLocaleString('fi-FI') + ' €';
+
+        const narratiiviDiv = document.getElementById('narratiivi');
+        narratiiviDiv.innerHTML = json.narratiivi
+            .split('\n')
+            .filter(r => r.trim() && !r.startsWith('#') && !r.startsWith('**'))
+            .map(r => `<p>${r}</p>`)
+            .join('');
+
+        lataaja.style.display = 'none';
+        raportti.style.display = 'block';
+
+    } catch(e) {
+        clearInterval(intervalId);
+        lataaja.style.display = 'none';
+        virhe.textContent = 'Virhe: ' + e.message;
+        nappi.disabled = false;
+    }
+}
+</script>
+
+</body>
+</html>
