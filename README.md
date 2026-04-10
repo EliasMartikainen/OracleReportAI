@@ -9,15 +9,18 @@ Projekti generoi ihmisluettavan HTML-raportin suoraan tietokannasta — ilman ma
 ---
 
 ## Arkkitehtuuri
+
+```text
 Oracle DB (myyntidata)
-↓
+    ↓
 PL/SQL (aggregoi datan yhteenvedoksi)
-↓
+    ↓
 Python (lukee DB:stä, kutsuu Claude APIa)
-↓
+    ↓
 Claude API (kirjoittaa narratiivin datasta)
-↓
+    ↓
 HTML-raportti (valmis output)
+```
 
 ---
 
